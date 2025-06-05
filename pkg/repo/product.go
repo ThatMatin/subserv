@@ -8,5 +8,5 @@ import (
 
 type ProductRepository interface {
 	GetByID(ctx context.Context, ID uint) (*model.Product, error)
-    GetAll(ctx context.Context) ([]model.Product, error)
+	GetAll(ctx context.Context) ([]model.Product, error)
 }

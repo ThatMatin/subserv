@@ -7,7 +7,7 @@ import (
 type Product struct {
 	ID       uint
 	Name     string
-	Price    float32
+	Price    int
 	TaxRate  uint8
 	Duration time.Duration
 }

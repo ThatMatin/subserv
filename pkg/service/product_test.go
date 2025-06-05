@@ -20,7 +20,7 @@ func TestFetchSingleProduct(t *testing.T) {
 		inputID          uint
 		expectedName     string
 		expectedErr      error
-        errorContains string
+		errorContains    string
 		expectedDuration time.Duration
 		setupMock        func(repo *mock.MockProductRepo)
 	}{
@@ -44,10 +44,10 @@ func TestFetchSingleProduct(t *testing.T) {
 			},
 		},
 		{
-			name:        "any other repository error",
-			inputID:     3,
-            expectedErr: errors.New(""),
-            errorContains: "failed to fetch",
+			name:          "any other repository error",
+			inputID:       3,
+			expectedErr:   errors.New(""),
+			errorContains: "failed to fetch",
 			setupMock: func(repo *mock.MockProductRepo) {
 				repo.On("GetByID", ctx, uint(3)).Return((*model.Product)(nil), gorm.ErrInvalidDB)
 			},
@@ -64,11 +64,11 @@ func TestFetchSingleProduct(t *testing.T) {
 			product, err := svc.Get(ctx, tc.inputID)
 			if tc.expectedErr != nil {
 				require.Error(t, err)
-                if tc.errorContains == "" {
-                    require.ErrorIs(t, err, tc.expectedErr)
-                } else {
-                    require.ErrorContains(t, err, tc.errorContains)
-                }
+				if tc.errorContains == "" {
+					require.ErrorIs(t, err, tc.expectedErr)
+				} else {
+					require.ErrorContains(t, err, tc.errorContains)
+				}
 
 			} else {
 				require.NoError(t, err)
@@ -85,10 +85,10 @@ func TestFetchListProduct(t *testing.T) {
 	ctx := context.Background()
 
 	testCases := []struct {
-		name        string
-		expectedLen int
-        errorContains string
-		setupMock   func(repo *mock.MockProductRepo)
+		name          string
+		expectedLen   int
+		errorContains string
+		setupMock     func(repo *mock.MockProductRepo)
 	}{
 		{
 			name:        "returns product list",
@@ -108,8 +108,8 @@ func TestFetchListProduct(t *testing.T) {
 			},
 		},
 		{
-			name:        "repository error",
-			expectedLen: 0,
+			name:          "repository error",
+			expectedLen:   0,
 			errorContains: "failed to fetch",
 			setupMock: func(repo *mock.MockProductRepo) {
 				repo.On("GetAll", ctx).Return([]model.Product{}, errors.New("repository error"))
