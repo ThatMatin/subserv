@@ -31,7 +31,7 @@ func TestFetchSingleProduct(t *testing.T) {
 			expectedErr:      nil,
 			expectedDuration: time.Hour * 24 * 30,
 			setupMock: func(repo *mock.MockProductRepo) {
-				product := &model.Product{ID: uint(1), Name: "flowmotion", Duration: time.Hour * 24 * 30}
+				product := &model.Product{Model: gorm.Model{ID: 1}, Name: "flowmotion", Duration: time.Hour * 24 * 30}
 				repo.On("GetByID", ctx, uint(1)).Return(product, nil)
 			},
 		},
@@ -95,8 +95,8 @@ func TestFetchListProduct(t *testing.T) {
 			expectedLen: 2,
 			setupMock: func(repo *mock.MockProductRepo) {
 				repo.On("GetAll", ctx).Return([]model.Product{
-					{ID: 1, Name: "flowmotion"},
-					{ID: 2, Name: "flexifit"},
+					{Model: gorm.Model{ID: 1}, Name: "flowmotion"},
+					{Model: gorm.Model{ID: 2}, Name: "flexifit"},
 				}, nil)
 			},
 		},

@@ -5,12 +5,10 @@ import (
 	"github.com/thatmatin/subserv/internal/controller"
 )
 
-func registerProductRoutes(r *gin.Engine, c *controller.ProductController) *gin.Engine {
+func RegisterProductRoutes(r *gin.Engine, c *controller.ProductController) {
 	products := r.Group("/products")
 	{
-		products.GET("", c.GetProducts)
+		products.GET("", c.GetAllProducts)
 		products.GET("/:id", c.GetProductByID)
 	}
-
-	return r
 }

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/thatmatin/subserv/internal/mock"
 	"github.com/thatmatin/subserv/internal/model"
+	"gorm.io/gorm"
 )
 
 var fixedTime = time.Date(2020, time.May, 0, 0, 0, 0, 0, time.UTC)
@@ -39,7 +40,7 @@ func TestFetchSubscriptionInfo(t *testing.T) {
 			expectedPrice:    1000,
 			setupMock: func(repo *mock.MockSubscriptionRepo) {
 				subscription := &model.Subscription{
-					ID:        uint(1),
+					Model:     gorm.Model{ID: 1},
 					UserID:    uint(1),
 					Start:     fixedTime,
 					End:       fixedTime.Add(time.Hour * 24 * 30),
@@ -121,7 +122,7 @@ func TestCreateSubscription(t *testing.T) {
 			expectedState: model.Pending,
 			setupMock: func(subsRepo *mock.MockSubscriptionRepo, prodRepo *mock.MockProductRepo, userRepo *mock.MockUserRepo) {
 				product := &model.Product{
-					ID:       uint(1),
+					Model:    gorm.Model{ID: 1},
 					Name:     "flowmotion",
 					Duration: time.Hour * 24 * 30,
 					Price:    10000,
@@ -207,7 +208,7 @@ func TestPauseSubscription(t *testing.T) {
 				start := time.Now()
 				end := start.Add(time.Hour * 24 * 30)
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 					Start: start,
 					End:   end,
@@ -222,7 +223,7 @@ func TestPauseSubscription(t *testing.T) {
 			status:      model.Paused,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -234,7 +235,7 @@ func TestPauseSubscription(t *testing.T) {
 			status:      model.Cancelled,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -246,7 +247,7 @@ func TestPauseSubscription(t *testing.T) {
 			status:      model.Expired,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -288,7 +289,7 @@ func TestCancelSubscription(t *testing.T) {
 				start := time.Now()
 				end := start.Add(time.Hour * 24 * 30)
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 					Start: start,
 					End:   end,
@@ -305,7 +306,7 @@ func TestCancelSubscription(t *testing.T) {
 				start := time.Now()
 				end := start.Add(time.Hour * 24 * 30)
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 					Start: start,
 					End:   end,
@@ -323,7 +324,7 @@ func TestCancelSubscription(t *testing.T) {
 				start := time.Now()
 				end := start.Add(time.Hour * 24 * 30)
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 					Start: start,
 					End:   end,
@@ -338,7 +339,7 @@ func TestCancelSubscription(t *testing.T) {
 			status:      model.Cancelled,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -350,7 +351,7 @@ func TestCancelSubscription(t *testing.T) {
 			status:      model.Expired,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -393,7 +394,7 @@ func TestUnpauseSubscription(t *testing.T) {
 				end := start.Add(time.Hour * 24 * 2)
 				pauseAt := start.Add(time.Hour * 24)
 				subscription := &model.Subscription{
-					ID:       1,
+					Model:    gorm.Model{ID: 1},
 					State:    state,
 					Start:    start,
 					End:      end,
@@ -409,7 +410,7 @@ func TestUnpauseSubscription(t *testing.T) {
 			state:       model.Active,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -421,7 +422,7 @@ func TestUnpauseSubscription(t *testing.T) {
 			state:       model.Cancelled,
 			setupMock: func(repo *mock.MockSubscriptionRepo, state model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: state,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)
@@ -433,7 +434,7 @@ func TestUnpauseSubscription(t *testing.T) {
 			state:       model.Expired,
 			setupMock: func(repo *mock.MockSubscriptionRepo, status model.State) {
 				subscription := &model.Subscription{
-					ID:    1,
+					Model: gorm.Model{ID: 1},
 					State: status,
 				}
 				repo.On("GetByID", ctx, uint(1)).Return(subscription, nil)

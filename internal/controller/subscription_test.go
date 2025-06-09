@@ -14,6 +14,7 @@ import (
 	"github.com/thatmatin/subserv/internal/mock"
 	"github.com/thatmatin/subserv/internal/model"
 	"github.com/thatmatin/subserv/internal/service"
+	"gorm.io/gorm"
 )
 
 var fixedTime = time.Date(2020, time.May, 0, 0, 0, 0, 0, time.UTC)
@@ -39,7 +40,7 @@ func TestSubscriptionController(t *testing.T) {
 
 	t.Run("get subscription by id", func(t *testing.T) {
 		mockSubscriptionRepo.On("GetByID", mocklib.Anything, uint(1)).
-			Return(&model.Subscription{ID: 1, UserID: 1, ProductID: 1, State: model.Active}, nil)
+			Return(&model.Subscription{Model: gorm.Model{ID: 1}, UserID: 1, ProductID: 1, State: model.Active}, nil)
 
 		w := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/subscriptions/1", nil)
@@ -54,7 +55,7 @@ func TestSubscriptionController(t *testing.T) {
 	})
 
 	t.Run("create subscription", func(t *testing.T) {
-		mockProductRepo.On("GetByID", mocklib.Anything, uint(1)).Return(&model.Product{ID: 1, Name: "Test Product", Price: 1000, TaxRate: 20, Duration: 30}, nil)
+		mockProductRepo.On("GetByID", mocklib.Anything, uint(1)).Return(&model.Product{Model: gorm.Model{ID: 1}, Name: "Test Product", Price: 1000, TaxRate: 20, Duration: 30}, nil)
 		mockUserRepo.On("Exists", mocklib.Anything, uint(1)).Return(true, nil)
 		mockSubscriptionRepo.On("Create", mocklib.Anything, mocklib.Anything).Return(nil)
 
@@ -78,7 +79,7 @@ func TestSubscriptionController(t *testing.T) {
 
 	t.Run("purchase subscription", func(t *testing.T) {
 		mockSubscriptionRepo.On("GetByID", mocklib.Anything, uint(1)).
-			Return(&model.Subscription{ID: 1, UserID: 1, ProductID: 1, State: model.Pending}, nil)
+			Return(&model.Subscription{Model: gorm.Model{ID: 1}, UserID: 1, ProductID: 1, State: model.Pending}, nil)
 		mockSubscriptionRepo.On("Save", mocklib.Anything, mocklib.Anything).Return(nil)
 
 		w := httptest.NewRecorder()
@@ -94,7 +95,7 @@ func TestSubscriptionController(t *testing.T) {
 
 	t.Run("pause subscription", func(t *testing.T) {
 		mockSubscriptionRepo.On("GetByID", mocklib.Anything, uint(1)).
-			Return(&model.Subscription{ID: 1, UserID: 1, ProductID: 1, State: model.Active}, nil)
+			Return(&model.Subscription{Model: gorm.Model{ID: 1}, UserID: 1, ProductID: 1, State: model.Active}, nil)
 		mockSubscriptionRepo.On("Save", mocklib.Anything, mocklib.Anything).Return(nil)
 
 		w := httptest.NewRecorder()
@@ -109,7 +110,7 @@ func TestSubscriptionController(t *testing.T) {
 
 	t.Run("unpause subscription", func(t *testing.T) {
 		mockSubscriptionRepo.On("GetByID", mocklib.Anything, uint(1)).
-			Return(&model.Subscription{ID: 1, UserID: 1, ProductID: 1, State: model.Paused, PausedAt: &fixedTime}, nil)
+			Return(&model.Subscription{Model: gorm.Model{ID: 1}, UserID: 1, ProductID: 1, State: model.Paused, PausedAt: &fixedTime}, nil)
 		mockSubscriptionRepo.On("Save", mocklib.Anything, mocklib.Anything).Return(nil)
 
 		w := httptest.NewRecorder()
@@ -124,7 +125,7 @@ func TestSubscriptionController(t *testing.T) {
 
 	t.Run("cancel subscription", func(t *testing.T) {
 		mockSubscriptionRepo.On("GetByID", mocklib.Anything, uint(1)).
-			Return(&model.Subscription{ID: 1, UserID: 1, ProductID: 1, State: model.Active}, nil)
+			Return(&model.Subscription{Model: gorm.Model{ID: 1}, UserID: 1, ProductID: 1, State: model.Active}, nil)
 		mockSubscriptionRepo.On("Save", mocklib.Anything, mocklib.Anything).Return(nil)
 
 		w := httptest.NewRecorder()

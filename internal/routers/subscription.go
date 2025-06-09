@@ -5,7 +5,7 @@ import (
 	"github.com/thatmatin/subserv/internal/controller"
 )
 
-func registerSubscriptionRoutes(r *gin.Engine, s *controller.SubscriptionController) *gin.Engine {
+func RegisterSubscriptionRoutes(r *gin.Engine, s *controller.SubscriptionController) {
 	subscriptions := r.Group("/subscriptions")
 	{
 		subscriptions.GET("/:id", s.GetSubscriptionByID)
@@ -15,6 +15,4 @@ func registerSubscriptionRoutes(r *gin.Engine, s *controller.SubscriptionControl
 		subscriptions.PATCH("/:id/unpause", s.UnpauseSubscription)
 		subscriptions.PATCH("/:id/cancel", s.CancelSubscription)
 	}
-
-	return r
 }

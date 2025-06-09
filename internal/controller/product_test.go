@@ -11,6 +11,7 @@ import (
 	"github.com/thatmatin/subserv/internal/mock"
 	"github.com/thatmatin/subserv/internal/model"
 	"github.com/thatmatin/subserv/internal/service"
+	"gorm.io/gorm"
 )
 
 func TestProductController(t *testing.T) {
@@ -18,15 +19,15 @@ func TestProductController(t *testing.T) {
 
 	mockProductRepo := new(mock.MockProductRepo)
 	mockProductService := service.NewProductService(mockProductRepo)
-	productController := NewProductController(router, &mockProductService)
+	productController := NewProductController(&mockProductService)
 
-	router.GET("/products", productController.GetProducts)
+	router.GET("/products", productController.GetAllProducts)
 	router.GET("/products/:id", productController.GetProductByID)
 
 	t.Run("get all products", func(t *testing.T) {
 		mockProductRepo.On("GetAll", mocklib.Anything).Return([]model.Product{
-			{ID: 1, Name: "Product 1"},
-			{ID: 2, Name: "Product 2"},
+			{Model: gorm.Model{ID: 1}, Name: "Product 1"},
+			{Model: gorm.Model{ID: 2}, Name: "Product 2"},
 		}, nil)
 
 		w := httptest.NewRecorder()
@@ -38,7 +39,7 @@ func TestProductController(t *testing.T) {
 	})
 
 	t.Run("get product by id", func(t *testing.T) {
-		mockProductRepo.On("GetByID", mocklib.Anything, uint(1)).Return(&model.Product{ID: 1}, nil)
+		mockProductRepo.On("GetByID", mocklib.Anything, uint(1)).Return(&model.Product{Model: gorm.Model{ID: 1}}, nil)
 
 		w := httptest.NewRecorder()
 		req := httptest.NewRequest(http.MethodGet, "/products/1", nil)
