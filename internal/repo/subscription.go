@@ -3,7 +3,7 @@ package repo
 import (
 	"context"
 
-	"github.com/thatmatin/subserv/pkg/model"
+	"github.com/thatmatin/subserv/internal/model"
 )
 
 type SubscriptionRepository interface {

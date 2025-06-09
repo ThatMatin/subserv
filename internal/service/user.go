@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/thatmatin/subserv/pkg/repo"
+	"github.com/thatmatin/subserv/internal/repo"
 )
 
 type UserService interface {

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
-	"github.com/thatmatin/subserv/pkg/mock"
-	"github.com/thatmatin/subserv/pkg/model"
+	"github.com/thatmatin/subserv/internal/mock"
+	"github.com/thatmatin/subserv/internal/model"
 	"gorm.io/gorm"
 )
 

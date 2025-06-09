@@ -8,8 +8,8 @@ import (
 
 	mocklib "github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
-	"github.com/thatmatin/subserv/pkg/mock"
-	"github.com/thatmatin/subserv/pkg/model"
+	"github.com/thatmatin/subserv/internal/mock"
+	"github.com/thatmatin/subserv/internal/model"
 )
 
 var fixedTime = time.Date(2020, time.May, 0, 0, 0, 0, 0, time.UTC)

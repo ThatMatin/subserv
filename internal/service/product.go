@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/thatmatin/subserv/pkg/model"
-	"github.com/thatmatin/subserv/pkg/repo"
+	"github.com/thatmatin/subserv/internal/model"
+	"github.com/thatmatin/subserv/internal/repo"
 	"gorm.io/gorm"
 )
 

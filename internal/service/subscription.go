@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/thatmatin/subserv/internal/model"
+	"github.com/thatmatin/subserv/internal/repo"
 	"github.com/thatmatin/subserv/internal/utils"
-	"github.com/thatmatin/subserv/pkg/model"
-	"github.com/thatmatin/subserv/pkg/repo"
 	"gorm.io/gorm"
 )
 
@@ -184,6 +184,7 @@ func (s *subscriptionService) Unpause(ctx context.Context, ID uint) error {
 	case model.Paused:
 		subscription.State = model.Active
 		now := time.Now().In(UTCLocation)
+		// TODO: Handle case where PausedAt is nil
 		pausedDuration := now.Sub(*subscription.PausedAt)
 		subscription.End = subscription.End.Add(pausedDuration)
 

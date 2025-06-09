@@ -12,4 +12,5 @@ var (
 	ErrInvalidState         = errors.New("can't pause at this state")
 	ErrNoPendingPayment     = errors.New("no pending payment for this subscription")
 	ErrFailedPayment        = errors.New("payment failed")
+	ErrUnauthorizedAccess   = errors.New("unauthorized access on subscription")
 )

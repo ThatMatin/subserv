@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/stretchr/testify/mock"
-	"github.com/thatmatin/subserv/pkg/model"
+	"github.com/thatmatin/subserv/internal/model"
 )
 
 type MockProductRepo struct {
