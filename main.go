@@ -2,7 +2,7 @@ package main
 
 import "github.com/thatmatin/subserv/cmd"
 
-// @securityDefinitions.apikey Bearer
+// @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
 func main() {

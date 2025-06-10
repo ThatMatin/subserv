@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,11 +25,13 @@ func NewSubscriptionController(subService *service.SubscriptionService) *Subscri
 // @Description Fetch subscription by ID for the authenticated user
 // @Tags Subscriptions
 // @Produce json
+// @Param id path string true "Subscription ID"
 // @Success 200 {object} dto.SubscriptionResponse
+// @Failure 401 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /subscriptions/{id} [get]
-// @Security BearerAuth
+// @Security ApiKeyAuth
 func (c *SubscriptionController) GetSubscriptionByID(ctx *gin.Context) {
 	var uri dto.SubscriptionRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -38,10 +41,11 @@ func (c *SubscriptionController) GetSubscriptionByID(ctx *gin.Context) {
 
 	subscription, err := c.svc.Get(ctx, uri.ID)
 	if err != nil {
-		if err == service.ErrSubscriptionNotFound {
+		if errors.Is(err, service.ErrSubscriptionNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Subscription not found"})
 			return
 		}
+
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to fetch subscription"})
 		return
 	}
@@ -57,11 +61,11 @@ func (c *SubscriptionController) GetSubscriptionByID(ctx *gin.Context) {
 // @Param request body dto.CreateSubscriptionRequest true "Subscription creation request"
 // @Success 201 {object} dto.SubscriptionResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @failure 401 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
-// @Failure 409 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /subscriptions [post]
-// @Security BearerAuth
+// @Security ApiKeyAuth
 func (c *SubscriptionController) CreateSubscription(ctx *gin.Context) {
 	var req dto.CreateSubscriptionRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -79,11 +83,11 @@ func (c *SubscriptionController) CreateSubscription(ctx *gin.Context) {
 
 	subscription, err := c.svc.Create(ctx, req.ProductID, userID)
 	if err != nil {
-		if err == service.ErrProductNotFound {
+		if errors.Is(err, service.ErrProductNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Product not found"})
 			return
 		}
-		if err == service.ErrUserNotFound {
+		if errors.Is(err, service.ErrUserNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "User not found"})
 			return
 		}
@@ -102,11 +106,12 @@ func (c *SubscriptionController) CreateSubscription(ctx *gin.Context) {
 // @Param id path string true "Subscription ID"
 // @Success 200 {object} dto.SubscriptionMessageResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
-// @Failure 409 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
-// @Router /subscriptions/{id}/purchase [patch]
-// @Security BearerAuth
+// @Router /subscriptions/{id}/purchase [post]
+// @Security ApiKeyAuth
 func (c *SubscriptionController) Purchase(ctx *gin.Context) {
 	var uri dto.SubscriptionRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -115,12 +120,13 @@ func (c *SubscriptionController) Purchase(ctx *gin.Context) {
 	}
 
 	if err := c.svc.Purchase(ctx, uri.ID); err != nil {
-		if err == service.ErrSubscriptionNotFound {
+		if errors.Is(err, service.ErrSubscriptionNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Subscription not found"})
 			return
 		}
-		if err == service.ErrNoPendingPayment {
-			ctx.JSON(http.StatusConflict, dto.ErrorResponse{Message: "No pending payment for this subscription"})
+
+		if errors.Is(err, service.ErrNoPendingPayment) {
+			ctx.JSON(http.StatusForbidden, dto.ErrorResponse{Message: "No pending payment for this subscription"})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to purchase subscription"})
@@ -137,10 +143,12 @@ func (c *SubscriptionController) Purchase(ctx *gin.Context) {
 // @Param id path string true "Subscription ID"
 // @Success 202 {object} dto.SubscriptionMessageResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /subscriptions/{id}/pause [patch]
-// @Security BearerAuth
+// @Security ApiKeyAuth
 func (c *SubscriptionController) PauseSubscription(ctx *gin.Context) {
 	var uri dto.SubscriptionRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -149,10 +157,16 @@ func (c *SubscriptionController) PauseSubscription(ctx *gin.Context) {
 	}
 
 	if err := c.svc.Pause(ctx, uri.ID); err != nil {
-		if err == service.ErrSubscriptionNotFound {
+		if errors.Is(err, service.ErrSubscriptionNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Subscription not found"})
 			return
 		}
+
+		if errors.Is(err, service.ErrInvalidState) {
+			ctx.JSON(http.StatusForbidden, dto.ErrorResponse{Message: err.Error()})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to pause subscription"})
 		return
 	}
@@ -167,10 +181,12 @@ func (c *SubscriptionController) PauseSubscription(ctx *gin.Context) {
 // @Param id path string true "Subscription ID"
 // @Success 202 {object} dto.SubscriptionMessageResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /subscriptions/{id}/unpause [patch]
-// @Security BearerAuth
+// @Security ApiKeyAuth
 func (c *SubscriptionController) UnpauseSubscription(ctx *gin.Context) {
 	var uri dto.SubscriptionRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -179,10 +195,16 @@ func (c *SubscriptionController) UnpauseSubscription(ctx *gin.Context) {
 	}
 
 	if err := c.svc.Unpause(ctx, uri.ID); err != nil {
-		if err == service.ErrSubscriptionNotFound {
+		if errors.Is(err, service.ErrSubscriptionNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Subscription not found"})
 			return
 		}
+
+		if errors.Is(err, service.ErrInvalidState) {
+			ctx.JSON(http.StatusForbidden, dto.ErrorResponse{Message: err.Error()})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to unpause subscription"})
 		return
 	}
@@ -197,10 +219,12 @@ func (c *SubscriptionController) UnpauseSubscription(ctx *gin.Context) {
 // @Param id path string true "Subscription ID"
 // @Success 202 {object} dto.SubscriptionMessageResponse
 // @Failure 400 {object} dto.ErrorResponse
+// @Failure 401 {object} dto.ErrorResponse
+// @Failure 403 {object} dto.ErrorResponse
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /subscriptions/{id}/cancel [patch]
-// @Security BearerAuth
+// @Security ApiKeyAuth
 func (c *SubscriptionController) CancelSubscription(ctx *gin.Context) {
 	var uri dto.SubscriptionRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -209,10 +233,16 @@ func (c *SubscriptionController) CancelSubscription(ctx *gin.Context) {
 	}
 
 	if err := c.svc.Cancel(ctx, uri.ID); err != nil {
-		if err == service.ErrSubscriptionNotFound {
+		if errors.Is(err, service.ErrSubscriptionNotFound) {
 			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Subscription not found"})
 			return
 		}
+
+		if errors.Is(err, service.ErrInvalidState) {
+			ctx.JSON(http.StatusForbidden, dto.ErrorResponse{Message: err.Error()})
+			return
+		}
+
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to cancel subscription"})
 		return
 	}

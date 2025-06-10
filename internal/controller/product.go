@@ -28,7 +28,6 @@ func NewProductController(prodService *service.ProductService) *ProductControlle
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /products [get]
-// @Security BearerAuth
 func (c *ProductController) GetAllProducts(ctx *gin.Context) {
 	products, err := c.svc.GetAll(ctx)
 	if err != nil {
@@ -53,7 +52,6 @@ func (c *ProductController) GetAllProducts(ctx *gin.Context) {
 // @Failure 404 {object} dto.ErrorResponse
 // @Failure 500 {object} dto.ErrorResponse
 // @Router /products/{id} [get]
-// @Security BearerAuth
 func (c *ProductController) GetProductByID(ctx *gin.Context) {
 	var uri dto.ProductRequest
 	if err := ctx.ShouldBindUri(&uri); err != nil {
@@ -64,7 +62,7 @@ func (c *ProductController) GetProductByID(ctx *gin.Context) {
 	product, err := c.svc.Get(ctx, uri.ID)
 	if err != nil {
 		if err.Error() == "record not found" {
-			ctx.JSON(http.StatusOK, dto.ErrorResponse{Message: "Product not found"})
+			ctx.JSON(http.StatusNotFound, dto.ErrorResponse{Message: "Product not found"})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, dto.ErrorResponse{Message: "Failed to fetch product"})

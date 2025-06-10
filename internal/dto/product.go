@@ -29,11 +29,12 @@ type ProductListResponse struct {
 
 func ToProductResponse(product *model.Product) ProductResponse {
 	return ProductResponse{
-		ID:       product.ID,
-		Name:     product.Name,
-		Price:    product.Price,
-		TaxRate:  product.TaxRate,
-		Duration: product.Duration,
+		ID:          product.ID,
+		Name:        product.Name,
+		Price:       product.Price,
+		TaxRate:     product.TaxRate,
+		Duration:    product.Duration,
+		Description: product.Description,
 	}
 }
 

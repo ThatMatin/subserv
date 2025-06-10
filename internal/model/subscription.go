@@ -28,3 +28,5 @@ const (
 	Expired
 	Failed
 )
+
+var StateNames = [...]string{"Pending", "Active", "Paused", "Cancelled", "Expired", "Failed"}

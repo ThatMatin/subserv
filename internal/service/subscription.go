@@ -78,7 +78,7 @@ func (s *subscriptionService) Create(ctx context.Context, productID uint, userID
 		UserID:    userID,
 		ProductID: productID,
 		Start:     now,
-		End:       now.Add(product.Duration),
+		End:       now.Add(product.Duration * 1e9), // Duration is in seconds, convert to nanoseconds
 		State:     model.Pending,
 		PriceCent: product.Price,
 		TaxRate:   product.TaxRate,
@@ -94,6 +94,10 @@ func (s *subscriptionService) Create(ctx context.Context, productID uint, userID
 func (s *subscriptionService) Purchase(ctx context.Context, ID uint) error {
 	subscription, err := s.Get(ctx, ID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrSubscriptionNotFound
+		}
+
 		return fmt.Errorf("couldn't pause subscription: %w", err)
 	}
 
@@ -115,7 +119,7 @@ func (s *subscriptionService) Purchase(ctx context.Context, ID uint) error {
 
 	// idempotency and log of successful payment must be implemented in real payment implementation
 	subscription.State = model.Active
-	duration := subscription.Start.Sub(subscription.End)
+	duration := subscription.End.Sub(subscription.Start)
 	subscription.Start = time.Now().In(UTCLocation)
 	subscription.End = subscription.Start.Add(duration)
 	if err := s.subsRepo.Save(ctx, subscription); err != nil {
@@ -128,6 +132,10 @@ func (s *subscriptionService) Purchase(ctx context.Context, ID uint) error {
 func (s *subscriptionService) Pause(ctx context.Context, ID uint) error {
 	subscription, err := s.Get(ctx, ID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrSubscriptionNotFound
+		}
+
 		return fmt.Errorf("couldn't pause subscription: %w", err)
 	}
 
@@ -141,8 +149,10 @@ func (s *subscriptionService) Pause(ctx context.Context, ID uint) error {
 			if err := s.subsRepo.Save(ctx, subscription); err != nil {
 				return fmt.Errorf("couldn't pause subscription: %w", err)
 			}
+
+			return nil
 		}
-		return nil
+		return ErrAlreadyExpired
 	case model.Paused:
 		return ErrAlreadyPaused
 	default:
@@ -153,6 +163,10 @@ func (s *subscriptionService) Pause(ctx context.Context, ID uint) error {
 func (s *subscriptionService) Cancel(ctx context.Context, ID uint) error {
 	subscription, err := s.Get(ctx, ID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrSubscriptionNotFound
+		}
+
 		return fmt.Errorf("couldn't cancel subscription: %w", err)
 	}
 
@@ -165,8 +179,10 @@ func (s *subscriptionService) Cancel(ctx context.Context, ID uint) error {
 			if err := s.subsRepo.Save(ctx, subscription); err != nil {
 				return fmt.Errorf("couldn't cancel subscription: %w", err)
 			}
+
+			return nil
 		}
-		return nil
+		return ErrAlreadyExpired
 	case model.Cancelled:
 		return ErrAlreadyCancelled
 	default:
@@ -177,6 +193,10 @@ func (s *subscriptionService) Cancel(ctx context.Context, ID uint) error {
 func (s *subscriptionService) Unpause(ctx context.Context, ID uint) error {
 	subscription, err := s.Get(ctx, ID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrSubscriptionNotFound
+		}
+
 		return fmt.Errorf("couldn't unpause subscription: %w", err)
 	}
 

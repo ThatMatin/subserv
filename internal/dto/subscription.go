@@ -15,15 +15,15 @@ type CreateSubscriptionRequest struct {
 }
 
 type SubscriptionResponse struct {
-	ID        uint   `json:"id"`
-	UserID    uint   `json:"user_id"`
-	ProductID uint   `json:"product_id"`
-	State     uint8  `json:"state"`
-	PriceCent int    `json:"price_cent"`
-	TaxRate   uint8  `json:"tax_rate"`
-	Start     string `json:"start"`
-	End       string `json:"end"`
-	PausedAt  string `json:"paused_at,omitempty"`
+	ID        uint       `json:"id"`
+	UserID    uint       `json:"user_id"`
+	ProductID uint       `json:"product_id"`
+	State     string     `json:"state"`
+	PriceCent int        `json:"price_cent"`
+	TaxRate   uint8      `json:"tax_rate"`
+	Start     time.Time  `json:"start"`
+	End       time.Time  `json:"end"`
+	PausedAt  *time.Time `json:"paused_at,omitempty"`
 }
 
 type SubscriptionMessageResponse struct {
@@ -35,18 +35,11 @@ func ToSubscriptionResponse(s *model.Subscription) SubscriptionResponse {
 		ID:        s.ID,
 		ProductID: s.ProductID,
 		UserID:    s.UserID,
-		State:     uint8(s.State),
+		State:     model.StateNames[s.State],
 		PriceCent: s.PriceCent,
 		TaxRate:   s.TaxRate,
-		Start:     s.Start.Format(time.RFC3339),
-		End:       s.End.Format(time.RFC3339),
-		PausedAt:  formatPausedAt(s.PausedAt),
+		Start:     s.Start,
+		End:       s.End,
+		PausedAt:  s.PausedAt,
 	}
-}
-
-func formatPausedAt(pausedAt *time.Time) string {
-	if pausedAt == nil {
-		return ""
-	}
-	return pausedAt.Format(time.RFC3339)
 }

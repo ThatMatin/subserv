@@ -11,15 +11,17 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	_ "github.com/thatmatin/subserv/docs"
 	"github.com/thatmatin/subserv/internal/controller"
 	"github.com/thatmatin/subserv/internal/db"
-	"github.com/thatmatin/subserv/internal/middleware"
 	"github.com/thatmatin/subserv/internal/repo"
 	"github.com/thatmatin/subserv/internal/routers"
 	"github.com/thatmatin/subserv/internal/service"
 )
 
-func RunAppandServe() {
+func RunAppandServe(withSwagger bool) {
 	r := gin.Default()
 	database, err := db.Setup()
 	if err != nil {
@@ -41,7 +43,10 @@ func RunAppandServe() {
 	routers.RegisterProductRoutes(r, productController)
 	routers.RegisterSubscriptionRoutes(r, subscriptionController)
 
-	r.Use(middleware.AuthMiddleware())
+	if withSwagger {
+		log.Println("Serving Swagger UI at http://localhost:8080/swagger/index.html")
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	server := &http.Server{
 		Addr:    ":8080",

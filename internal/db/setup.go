@@ -9,7 +9,7 @@ import (
 )
 
 func Setup() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("myproject.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("subserv.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect database: %w", err)
 	}
