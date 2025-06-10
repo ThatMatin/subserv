@@ -34,15 +34,18 @@ AC:
 
 - Only the endpoints related to the user story are implemented. (e.g. no admin endpoints, user management, payment management, etc.)
 - The application is designed to be modular and extensible, allowing for easy addition of new features and endpoints in the future.
-- The application uses JWT for authentication, but does not implement user management or registration endpoints, so in the swagger UI you can use the `Authorization` header to pass the JWT token for testing purposes. Simply pass `Bearer test-token` as the value of the `Authorization` header in your requests.
+- **Important** The application uses JWT for authentication, but does not implement user management or registration endpoints, so in the swagger UI use the `Authorization` header to pass the JWT token for testing purposes. Simply pass **`Bearer test-token`** as the value of the `Authorization` header in your requests.
 - Payment is a dummy implementation and does not involve real payment processing. The payment processor is designed to simulate a successful payment transaction for testing purposes with %5 chance of failure.
 - Unit tests are provided to ensure the functionality of the application. The tests cover the main features and endpoints, but do not include exhaustive coverage of all possible scenarios. and integration tests are not implemented.
 - Current pause logic is a simple implementation that does not account for complex scenarios such as overlapping pause periods or multiple pauses. It is designed to demonstrate the basic functionality of pausing and resuming subscriptions.
 - Docker, Makefile, and other common development tools are not used in this project to keep the implementation simple and focused on the core functionality. However, the project can be easily extended to include these tools in the future if needed.
 - Configurations are hardcoded in the codebase for simplicity, but usually they are implemented by Viper and managed by environment variables or configuration files in production applications.
 - A proper logging implementation is not included in this project. The application uses simple print statements for logging, but in a production application, a structured logging library (my choice being **Logrus**) would be used to provide better logging capabilities.
-## 📦 Installation
-
+## 📦 Setup
+If you want to run it through Docker:
+```bash
+docker run -it -p 8080:8080 golang:1.24.4-bookworm /bin/sh
+```
 Fetch repository, and run the following command to install the dependencies:
 ```bash
 git clone https://github.com/thatmatin/subserv.github
