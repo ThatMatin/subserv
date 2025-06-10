@@ -48,7 +48,7 @@ docker run -it -p 8080:8080 golang:1.24.4-bookworm /bin/sh
 ```
 Fetch repository, and run the following command to install the dependencies:
 ```bash
-git clone https://github.com/thatmatin/subserv.github
+git clone https://github.com/thatmatin/subserv.git
 cd subserv
 go mod tidy
 ```
